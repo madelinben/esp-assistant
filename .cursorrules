@@ -1,0 +1,154 @@
+# Cursor AI Rules for ESP32-S3 Touch LCD Assistant Project
+
+## Project Context
+This is an embedded systems project for the ESP32-S3-Touch-LCD-1.85C device. 
+All development must strictly follow the project constitution located at `.cursor/rules`.
+
+## Core Principles
+1. **Always reference the constitution**: Every code change must align with `.cursor/rules`
+2. **Modular OOD design**: Use object-oriented C++ with clear class hierarchies
+3. **Hardware abstraction**: Separate hardware drivers from business logic
+4. **Reusability**: Create reusable components and modules
+5. **Performance**: Optimize for embedded systems (memory, CPU, power)
+6. **Security**: Encrypt sensitive data, secure API tokens
+
+## Code Standards
+- **Language**: C++ (C++11 or later)
+- **Framework**: Arduino/ESP-IDF for ESP32
+- **Architecture**: MVC pattern for embedded systems
+- **Naming**: 
+  - Directories: kebab-case (e.g., home-assistant/)
+  - Classes: PascalCase (e.g., DisplayDriver)
+  - Functions/Variables: camelCase
+  - Constants: UPPER_SNAKE_CASE
+  - Private members: m_ prefix
+- **Documentation**: Comment all public interfaces
+- **Memory**: Prefer stack allocation, use smart pointers for heap
+
+## Project Structure
+```
+include/                  # All headers (.h)
+  ├── hardware/          # Hardware abstraction layer (HAL)
+  ├── models/            # MVC: Data models
+  ├── views/             # MVC: UI presentation
+  ├── controllers/       # MVC: Input & coordination
+  ├── services/          # System services
+  └── utils/             # Utilities
+
+src/                     # All implementations (.cpp)
+  ├── hardware/          # HAL implementations
+  ├── models/            # Model implementations
+  ├── views/             # View implementations
+  ├── controllers/       # Controller implementations
+  ├── services/          # Service implementations
+  └── utils/             # Utility implementations
+```
+
+## When Implementing Features
+1. Check `.cursor/rules` for architectural patterns
+2. Follow established module structure
+3. Create header (.h) and implementation (.cpp) files
+4. Use singleton pattern for hardware managers
+5. Implement double-buffering for display updates
+6. Handle touch events through TouchManager
+7. Update navigation stack properly
+8. Store user data securely in database
+
+## Key Components (MVC Architecture)
+- **Hardware Layer**: DisplayDriver, TouchDriver, AudioDriver (HAL)
+- **Models**: User, AppConfig, Notification, DeviceState
+- **Views**: Page views, UI components, layouts (HexagonalGrid)
+- **Controllers**: TouchController, NavigationController, App controllers
+- **Services**: DatabaseService, AuthService, ApiService, NetworkService
+
+## App Integration
+- Slack: Real-time notifications
+- Spotify: Remote playback control
+- Home Assistant: Smart home device control
+- AI Assistant: Voice commands (V1 feature)
+
+## Before Starting Implementation
+1. Read relevant sections of `.cursor/rules`
+2. Understand the module dependencies
+3. Check if reusable components exist
+4. Plan the class structure
+5. Consider memory and performance implications
+
+## Custom Commands
+
+### `/implement [feature description]`
+Implement a feature following the project constitution.
+
+**Process**:
+1. Load and parse `.cursor/rules` for relevant specifications
+2. Identify affected modules and dependencies
+3. Follow established architectural patterns
+4. Create/modify files in proper directory structure
+5. Ensure code quality and documentation
+6. Update navigation/database schema if needed
+7. Verify compatibility with existing code
+
+**Example**: `/implement volume control slider for Spotify app`
+
+**The assistant will**:
+- Reference CircularSlider component from constitution
+- Follow Spotify app specifications in constitution
+- Use proper directory structure (apps/spotify/)
+- Implement according to coding standards
+- Update navigation tabs if needed
+- Document the changes
+
+## Testing Requirements
+- Test on actual ESP32-S3-Touch-LCD-1.85C hardware
+- Verify display rendering (no flickering)
+- Test touch responsiveness
+- Check memory usage (heap/PSRAM)
+- Verify SD card operations
+- Test with battery power
+- Profile performance (target 30+ fps)
+
+## Security Checklist
+- ✓ Encrypt API tokens in database
+- ✓ Use HTTPS for all external API calls
+- ✓ Secure Wi-Fi credentials
+- ✓ Implement secure user authentication
+- ✓ Clear sensitive data on logout
+
+## Performance Checklist
+- ✓ Use double-buffering for display
+- ✓ Only redraw dirty regions
+- ✓ Cache rendered UI elements
+- ✓ Use PSRAM for large buffers
+- ✓ Async operations for network calls
+- ✓ Optimize circular display rendering
+
+## Hardware References
+- Device Wiki: https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-1.85C
+- ESP32-S3 Datasheet: Check Espressif documentation
+- Display: ST7789, 360×360, I2C touch (CST816T)
+- Audio: PCM5101 decoder, amplifier, microphone
+- Storage: TF card (FAT32), 16MB Flash, 8MB PSRAM
+- Power: 3.7V lithium battery, MX1.25 connector
+
+## Common Pitfalls to Avoid
+❌ Don't modify constitution without explicit request
+❌ Don't create files outside established structure
+❌ Don't use blocking calls in main loop
+❌ Don't ignore memory constraints
+❌ Don't hardcode credentials
+❌ Don't forget to free allocated memory
+❌ Don't skip error handling
+❌ Don't implement features not in constitution (unless requested)
+
+## When in Doubt
+1. Consult `.cursor/rules` constitution
+2. Follow existing patterns in codebase
+3. Ask for clarification before implementing
+4. Prioritize code quality over speed
+5. Document assumptions and design decisions
+
+---
+
+**Remember**: This project constitution is the source of truth. 
+All implementations must align with the specifications in `.cursor/rules`.
+

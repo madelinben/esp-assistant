@@ -1,0 +1,1167 @@
+# ESP32-S3 Touch LCD Assistant - Project Constitution
+
+## Project Overview
+This is an embedded systems project for the ESP32-S3-Touch-LCD-1.85C device, creating a personal assistant with touch display, microphone, speakers, and various app integrations.
+
+---
+
+## Hardware Specifications
+
+### ESP32-S3-Touch-LCD-1.85C Device
+- **Processor**: ESP32-S3R8, Dual-core Xtensa 32-bit LX7, up to 240MHz
+- **Memory**: 512KB SRAM, 384KB ROM, 16MB Flash, 8MB PSRAM
+- **Display**: 1.85" round touchscreen, 360×360 resolution, 262K colors
+- **Touch**: I2C interface with interrupt support
+- **Audio**: PCM5101 audio decoder, onboard amplifier, microphone, speaker header
+- **Storage**: TF card slot (for SQLite database)
+- **Power**: MP1605GTF-Z (3.3V 2A), MX1.25 battery header (3.7V lithium battery)
+- **GPIO Expansion**: TCA9554PWR chip
+- **RTC**: PCF85063 RTC clock chip with battery backup
+- **Connectivity**: 2.4GHz Wi-Fi (802.11 b/g/n), Bluetooth 5 (BLE)
+- **Interfaces**: UART, I2C (addresses: 0x15, 0x20, 0x51)
+
+Reference: https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-1.85C
+
+---
+
+## Project Architecture Principles
+
+### 1. Code Structure
+- **Language**: C++ with Object-Oriented Design (OOD)
+- **Framework**: Arduino/ESP-IDF for ESP32
+- **Architecture**: MVC (Model-View-Controller) pattern adapted for embedded systems
+- **Organization**: Modular class-based architecture
+- **Reusability**: All components must be reusable and well-encapsulated
+- **Separation of Concerns**: Clear separation between hardware, business logic, and presentation
+
+### 2. Naming Conventions
+- **Folders/Directories**: `kebab-case` (e.g., `home-assistant`, `lock-screen`)
+- **File Names**: `PascalCase` for classes (e.g., `DisplayManager.h`), `kebab-case` for others
+- **Classes**: `PascalCase` (e.g., `DisplayManager`)
+- **Functions/Variables**: `camelCase` (e.g., `getTouchPoint`)
+- **Constants**: `UPPER_SNAKE_CASE` (e.g., `SCREEN_WIDTH`)
+- **Private Members**: `m_` prefix (e.g., `m_buffer`)
+
+### 3. MVC Architecture for Embedded Systems
+
+#### Model Layer (Data & Business Logic)
+- **Location**: `src/models/` and `include/models/`
+- **Purpose**: Data structures, state management, business logic
+- **Examples**: User data, app configurations, device state
+- **Responsibilities**:
+  - Data validation and transformation
+  - State management
+  - Database interactions
+  - API data handling
+
+#### View Layer (UI Presentation)
+- **Location**: `src/views/` and `include/views/`
+- **Purpose**: UI rendering, display output
+- **Examples**: Page layouts, UI components, rendering
+- **Responsibilities**:
+  - Display rendering
+  - UI component drawing
+  - Visual feedback
+  - Screen updates
+
+#### Controller Layer (Input & Coordination)
+- **Location**: `src/controllers/` and `include/controllers/`
+- **Purpose**: Input handling, coordination between Model and View
+- **Examples**: Touch handlers, navigation logic, event dispatchers
+- **Responsibilities**:
+  - Process user input (touch, gestures)
+  - Update models based on input
+  - Trigger view updates
+  - Coordinate system behavior
+
+### 4. Project Directory Structure
+```
+esp-assistant/
+├── .cursor/
+│   └── rules                    # This file - project constitution
+│
+├── include/                     # All header files (.h)
+│   ├── config/
+│   │   └── Config.h            # Global configuration
+│   │
+│   ├── hardware/               # Hardware Abstraction Layer (HAL)
+│   │   ├── display/
+│   │   │   ├── DisplayDriver.h
+│   │   │   └── FrameBuffer.h
+│   │   ├── touch/
+│   │   │   └── TouchDriver.h
+│   │   ├── audio/
+│   │   │   ├── AudioDriver.h
+│   │   │   └── MicrophoneDriver.h
+│   │   ├── storage/
+│   │   │   ├── SDCardDriver.h
+│   │   │   └── FileSystem.h
+│   │   └── power/
+│   │       ├── BatteryMonitor.h
+│   │       └── PowerManager.h
+│   │
+│   ├── models/                 # MVC: Model Layer
+│   │   ├── User.h
+│   │   ├── AppConfig.h
+│   │   ├── Notification.h
+│   │   └── DeviceState.h
+│   │
+│   ├── views/                  # MVC: View Layer
+│   │   ├── components/         # Reusable UI components
+│   │   │   ├── Button.h
+│   │   │   ├── CircularSlider.h
+│   │   │   ├── NotificationBadge.h
+│   │   │   └── ProfileImage.h
+│   │   ├── layouts/            # Layout managers
+│   │   │   ├── HexagonalGrid.h
+│   │   │   └── CircularLayout.h
+│   │   ├── pages/              # Page views
+│   │   │   ├── HomeView.h
+│   │   │   ├── LockView.h
+│   │   │   ├── NotificationView.h
+│   │   │   └── SettingsView.h
+│   │   └── apps/               # App-specific views
+│   │       ├── slack/
+│   │       │   └── SlackView.h
+│   │       ├── spotify/
+│   │       │   └── SpotifyView.h
+│   │       ├── ai-assistant/
+│   │       │   └── AIAssistantView.h
+│   │       └── home-assistant/
+│   │           └── HomeAssistantView.h
+│   │
+│   ├── controllers/            # MVC: Controller Layer
+│   │   ├── TouchController.h
+│   │   ├── NavigationController.h
+│   │   ├── InputController.h
+│   │   └── apps/               # App-specific controllers
+│   │       ├── slack/
+│   │       │   └── SlackController.h
+│   │       ├── spotify/
+│   │       │   └── SpotifyController.h
+│   │       ├── ai-assistant/
+│   │       │   └── AIAssistantController.h
+│   │       └── home-assistant/
+│   │           └── HomeAssistantController.h
+│   │
+│   ├── services/               # System Services
+│   │   ├── DatabaseService.h
+│   │   ├── AuthService.h
+│   │   ├── ApiService.h
+│   │   └── NetworkService.h
+│   │
+│   └── utils/                  # Utility functions
+│       ├── Logger.h
+│       ├── Crypto.h
+│       └── Helpers.h
+│
+├── src/                        # All implementation files (.cpp)
+│   ├── main.cpp               # Entry point
+│   │
+│   ├── hardware/              # HAL implementations
+│   │   ├── display/
+│   │   │   ├── DisplayDriver.cpp
+│   │   │   └── FrameBuffer.cpp
+│   │   ├── touch/
+│   │   │   └── TouchDriver.cpp
+│   │   ├── audio/
+│   │   │   ├── AudioDriver.cpp
+│   │   │   └── MicrophoneDriver.cpp
+│   │   ├── storage/
+│   │   │   ├── SDCardDriver.cpp
+│   │   │   └── FileSystem.cpp
+│   │   └── power/
+│   │       ├── BatteryMonitor.cpp
+│   │       └── PowerManager.cpp
+│   │
+│   ├── models/                # Model implementations
+│   │   ├── User.cpp
+│   │   ├── AppConfig.cpp
+│   │   ├── Notification.cpp
+│   │   └── DeviceState.cpp
+│   │
+│   ├── views/                 # View implementations
+│   │   ├── components/
+│   │   │   ├── Button.cpp
+│   │   │   ├── CircularSlider.cpp
+│   │   │   ├── NotificationBadge.cpp
+│   │   │   └── ProfileImage.cpp
+│   │   ├── layouts/
+│   │   │   ├── HexagonalGrid.cpp
+│   │   │   └── CircularLayout.cpp
+│   │   ├── pages/
+│   │   │   ├── HomeView.cpp
+│   │   │   ├── LockView.cpp
+│   │   │   ├── NotificationView.cpp
+│   │   │   └── SettingsView.cpp
+│   │   └── apps/
+│   │       ├── slack/
+│   │       │   └── SlackView.cpp
+│   │       ├── spotify/
+│   │       │   └── SpotifyView.cpp
+│   │       ├── ai-assistant/
+│   │       │   └── AIAssistantView.cpp
+│   │       └── home-assistant/
+│   │           └── HomeAssistantView.cpp
+│   │
+│   ├── controllers/           # Controller implementations
+│   │   ├── TouchController.cpp
+│   │   ├── NavigationController.cpp
+│   │   ├── InputController.cpp
+│   │   └── apps/
+│   │       ├── slack/
+│   │       │   └── SlackController.cpp
+│   │       ├── spotify/
+│   │       │   └── SpotifyController.cpp
+│   │       ├── ai-assistant/
+│   │       │   └── AIAssistantController.cpp
+│   │       └── home-assistant/
+│   │           └── HomeAssistantController.cpp
+│   │
+│   ├── services/              # Service implementations
+│   │   ├── DatabaseService.cpp
+│   │   ├── AuthService.cpp
+│   │   ├── ApiService.cpp
+│   │   └── NetworkService.cpp
+│   │
+│   └── utils/                 # Utility implementations
+│       ├── Logger.cpp
+│       ├── Crypto.cpp
+│       └── Helpers.cpp
+│
+├── lib/                       # External/custom libraries
+├── data/                      # Filesystem data (TF card)
+│   ├── database/             # SQLite database
+│   ├── assets/               # Images, fonts, icons
+│   └── config/               # User configurations
+├── test/                      # Unit tests
+└── platformio.ini            # PlatformIO configuration
+```
+
+### 5. Module Organization Pattern
+
+Each module follows MVC separation:
+
+**Example: Spotify App**
+
+```cpp
+// MODEL: include/models/spotify/SpotifyTrack.h
+class SpotifyTrack {
+public:
+    String title;
+    String artist;
+    String albumArt;
+    int duration;
+    int position;
+};
+
+// VIEW: include/views/apps/spotify/SpotifyView.h
+class SpotifyView {
+public:
+    void render(const SpotifyTrack& track);
+    void showVolumeSlider(float volume);
+    void showSeekSlider(float position);
+};
+
+// CONTROLLER: include/controllers/apps/spotify/SpotifyController.h
+class SpotifyController {
+public:
+    void handleTouch(TouchEvent event);
+    void updateTrackInfo();
+    void play();
+    void pause();
+    void setVolume(float volume);
+private:
+    SpotifyTrack m_currentTrack;  // Model
+    SpotifyView m_view;           // View
+};
+```
+
+### 6. Design Patterns
+- **Singleton**: Hardware managers (single instance per hardware resource)
+- **Factory**: Creating UI components dynamically
+- **Observer**: Event handling and state updates
+- **Strategy**: Different rendering strategies per page
+- **Command**: Encapsulating user actions
+
+---
+
+## Core System Components
+
+### 1. Display System (`hardware/display/`)
+
+#### Requirements
+- **Library**: TFT_eSPI for display rendering
+- **Screen Type**: Circular 360×360 resolution
+- **Rendering**: Double-buffering to prevent flickering
+- **Border**: Rounded blue border showing screen edge
+- **Notification Bar**: Curved outer edge displaying time, username, profile image, notification badges
+
+#### Implementation Guidelines
+```cpp
+class DisplayManager {
+public:
+    static DisplayManager& getInstance();
+    void init();
+    void beginBuffer();
+    void endBuffer();
+    void swapBuffers();
+    void drawCircularBorder(uint16_t color);
+    void drawCurvedText(const char* text, float angle, float radius);
+    void clear();
+    // Screen dimensions
+    const int SCREEN_WIDTH = 360;
+    const int SCREEN_HEIGHT = 360;
+    const int SCREEN_RADIUS = 180;
+};
+
+class DoubleBuffer {
+private:
+    uint16_t* frontBuffer;
+    uint16_t* backBuffer;
+public:
+    void swap();
+    void clear();
+    uint16_t* getDrawBuffer();
+};
+```
+
+### 2. Touch Input System (`hardware/touch/`)
+
+#### Requirements
+- **Interface**: I2C with CST816T touch controller
+- **Features**: Single/multi-touch detection, gesture recognition, interrupt support
+- **Coordinates**: Map to circular display space
+- **Events**: Touch start, touch move, touch end, tap, drag, swipe
+
+#### Implementation Guidelines
+```cpp
+class TouchManager {
+public:
+    static TouchManager& getInstance();
+    void init();
+    bool isTouched();
+    void getTouchPoint(int16_t& x, int16_t& y);
+    bool isInsideCircle(int16_t x, int16_t y);
+    TouchEvent getEvent();
+};
+
+enum TouchEvent {
+    TOUCH_NONE,
+    TOUCH_TAP,
+    TOUCH_DRAG,
+    TOUCH_SWIPE_UP,
+    TOUCH_SWIPE_DOWN,
+    TOUCH_SWIPE_LEFT,
+    TOUCH_SWIPE_RIGHT
+};
+```
+
+### 3. Audio System (`hardware/audio/`)
+
+#### Requirements
+- **Decoder**: PCM5101 audio decoder chip
+- **Input**: Microphone for voice commands
+- **Output**: Speaker via amplifier
+- **Controls**: Volume adjustment
+- **Formats**: Support common audio formats
+
+#### Implementation Guidelines
+```cpp
+class AudioManager {
+public:
+    static AudioManager& getInstance();
+    void init();
+    void playTone(uint16_t frequency, uint32_t duration);
+    void playNotification();
+    void setVolume(uint8_t level);
+    void startRecording();
+    void stopRecording();
+    AudioBuffer* getRecordedAudio();
+};
+```
+
+### 4. Storage System (`hardware/storage/`)
+
+#### Requirements
+- **TF Card**: FAT32 format
+- **Database**: SQLite local database
+- **Encryption**: Secure storage for API tokens and user data
+- **Structure**: User profiles, app configurations, settings
+
+#### Implementation Guidelines
+```cpp
+class StorageManager {
+public:
+    static StorageManager& getInstance();
+    void init();
+    bool mountSDCard();
+    bool fileExists(const char* path);
+    File openFile(const char* path, const char* mode);
+};
+
+class Database {
+public:
+    static Database& getInstance();
+    void init();
+    bool executeQuery(const char* query);
+    User* getUserById(int userId);
+    AppConfig* getAppConfig(int userId, const char* appName);
+    void saveEncrypted(const char* key, const char* value);
+    String loadDecrypted(const char* key);
+};
+```
+
+### 5. Power Management (`hardware/power/`)
+
+#### Requirements
+- **Battery**: 3.7V lithium battery with MX1.25 connector
+- **Charging**: Battery charge management and indicator
+- **Monitoring**: Battery level, charging status
+- **Power Modes**: Active, sleep, deep sleep
+
+#### Implementation Guidelines
+```cpp
+class PowerManager {
+public:
+    static PowerManager& getInstance();
+    void init();
+    uint8_t getBatteryLevel();
+    bool isCharging();
+    void enableDeepSleep(uint32_t seconds);
+    void setLowPowerMode(bool enable);
+};
+```
+
+---
+
+## Navigation System (`core/navigation/`)
+
+### Navigation Stack Architecture
+- **Stack-based routing**: Push/pop pages onto navigation stack
+- **Route Guards**: Authentication/permission checks before navigation
+- **State Preservation**: Maintain page state when navigating back
+
+### Page Structure
+```
+home/                       # Home page with main menu
+├── menu/                   # Hexagonal grid of app icons
+└── app/                    # Individual app page (dynamic route)
+    ├── slack/             # Slack notifications
+    ├── spotify/           # Spotify remote control
+    ├── ai-assistant/      # AI voice assistant [V1]
+    └── home-assistant/    # Smart home control
+lock/                       # Lock screen
+├── clock/                  # Clock display
+├── calendar/              # Calendar view
+└── weather/               # Weather information
+notification/              # Notification center
+settings/                  # Device settings
+login/                     # User login/selection
+```
+
+**Route Paths**:
+- `/` → `home` (main menu)
+- `/lock` → Lock screen with clock
+- `/lock/calendar` → Calendar view
+- `/lock/weather` → Weather view
+- `/notification` → Notification center
+- `/settings` → Settings page
+- `/login` → User selection
+- `/app/slack` → Slack app
+- `/app/spotify` → Spotify app
+- `/app/home-assistant` → Home Assistant app
+- `/app/ai-assistant` → AI Assistant app [V1]
+```
+
+### Implementation Guidelines
+```cpp
+class NavigationStack {
+public:
+    static NavigationStack& getInstance();
+    void push(Page* page);
+    void pop();
+    Page* getCurrentPage();
+    bool canGoBack();
+    void reset();
+};
+
+class RouteGuard {
+public:
+    virtual bool canActivate(Route* route) = 0;
+};
+
+class LoginGuard : public RouteGuard {
+public:
+    bool canActivate(Route* route) override;
+};
+```
+
+---
+
+## UI System (`ui/`)
+
+### 1. Hexagonal Grid Layout (`ui/layouts/`)
+
+#### Requirements
+- **Pattern**: Interlocking hexagonal grid (Apple Watch style)
+- **Center-first**: First item in center, spiral outward
+- **Circular Items**: Each item is a circular icon
+- **Scrolling**: Drag to scroll when grid exceeds screen
+- **Adaptive**: Automatically arranges items based on count
+
+#### Implementation Guidelines
+```cpp
+class HexagonalGrid {
+public:
+    HexagonalGrid(int centerX, int centerY, int itemRadius);
+    void addItem(GridItem* item);
+    void removeItem(int index);
+    void render(DisplayManager& display);
+    void handleTouch(int16_t x, int16_t y);
+    GridItem* getItemAtPosition(int16_t x, int16_t y);
+    void scroll(int16_t deltaX, int16_t deltaY);
+private:
+    void calculateItemPositions();
+    std::vector<GridItem*> items;
+    int offsetX, offsetY;
+};
+
+struct GridItem {
+    const char* label;
+    const uint16_t* icon;  // Icon image data
+    void (*onTap)();       // Callback function
+};
+```
+
+### 2. UI Components (`ui/components/`)
+
+#### Reusable Components
+```cpp
+// Navigation Button
+class NavButton {
+public:
+    NavButton(int x, int y, const char* label, void (*callback)());
+    void render();
+    bool hitTest(int16_t x, int16_t y);
+};
+
+// Circular Slider (for volume, brightness, hue, etc.)
+class CircularSlider {
+public:
+    CircularSlider(int centerX, int centerY, int radius);
+    void setValue(float value);  // 0.0 to 1.0
+    float getValue();
+    void render();
+    void handleDrag(int16_t x, int16_t y);
+};
+
+// Notification Badge
+class NotificationBadge {
+public:
+    NotificationBadge(int x, int y);
+    void setCount(int count);
+    void render();
+};
+
+// Profile Image (circular)
+class ProfileImage {
+public:
+    ProfileImage(int x, int y, int radius);
+    void setImage(const uint16_t* imageData);
+    void render();
+};
+
+// Curved Text (for screen border)
+class CurvedText {
+public:
+    void draw(const char* text, float startAngle, float radius);
+};
+```
+
+### 3. Rendering System (`ui/rendering/`)
+
+#### Double Buffer Manager
+```cpp
+class RenderManager {
+public:
+    static RenderManager& getInstance();
+    void beginFrame();
+    void endFrame();
+    void drawComponent(UIComponent* component);
+    void setDirtyRegion(int x, int y, int w, int h);
+private:
+    DoubleBuffer buffer;
+    bool dirtyFlag;
+};
+```
+
+---
+
+## Authentication & User Management (`core/auth/`)
+
+### Requirements
+- **Multi-user Support**: Multiple user profiles with individual settings
+- **Login Screen**: Hexagonal grid showing user profile images
+- **Route Protection**: Guard protected routes requiring authentication
+- **Session Management**: Maintain logged-in state
+
+### Implementation Guidelines
+```cpp
+class AuthManager {
+public:
+    static AuthManager& getInstance();
+    bool login(int userId);
+    void logout();
+    User* getCurrentUser();
+    bool isAuthenticated();
+};
+
+struct User {
+    int id;
+    String username;
+    const uint16_t* profileImage;
+    bool isActive;
+};
+```
+
+---
+
+## Database Schema (`core/database/`)
+
+### Tables Structure
+```sql
+-- Users table
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    profile_image_path TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- App configurations table
+CREATE TABLE app_configs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    app_name TEXT NOT NULL,
+    is_enabled BOOLEAN DEFAULT 1,
+    config_json TEXT,  -- Encrypted JSON configuration
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- API tokens table (encrypted)
+CREATE TABLE api_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    app_name TEXT NOT NULL,
+    token_encrypted TEXT NOT NULL,
+    token_type TEXT,
+    expires_at TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Settings table
+CREATE TABLE settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    setting_key TEXT NOT NULL,
+    setting_value TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+---
+
+## Application Pages Specifications
+
+### 1. Main Menu Page (`pages/home/main_menu/`)
+
+#### Requirements
+- **Layout**: Hexagonal grid of app icons
+- **Icons**: Circular app icons with labels
+- **Dynamic**: Only show enabled apps for current user
+- **Interaction**: Tap icon to navigate to app page
+
+#### Apps to Display (if enabled)
+- Slack
+- Spotify
+- AI Assistant
+- Home Assistant
+- Settings
+- (Extensible for future apps)
+
+### 2. Lock Screen Page (`pages/lock_screen/`)
+
+#### Requirements
+- **Clock**: Large time display (digital or analog)
+- **Date**: Current date
+- **Weather**: Current weather icon and temperature
+- **Calendar**: Today's events count
+- **Minimal UI**: Clean, vibrant, clear information
+- **Wake**: Tap to show user selection screen
+
+### 3. Slack App Page (`apps/slack/`)
+
+#### Requirements
+- **API Integration**: Slack Web API
+- **Real-time Updates**: WebSocket for live notifications
+- **Display**: Center icon/image, notification text below, count in top-right
+- **Notifications Types**:
+  - Direct messages
+  - Channel mentions
+  - Favorite channels activity
+  - Incoming calls
+- **Reference**: Apple Watch Slack notification style
+
+#### Implementation Guidelines
+```cpp
+class SlackApp : public AppPage {
+public:
+    void init() override;
+    void render() override;
+    void update() override;
+    void handleTouch(TouchEvent event) override;
+private:
+    void fetchNotifications();
+    void displayNotification(SlackNotification* notif);
+    std::vector<SlackNotification*> notifications;
+    int unreadCount;
+};
+```
+
+### 4. Spotify App Page (`apps/spotify/`)
+
+#### Requirements
+- **API Integration**: Spotify Web API
+- **Display**: 
+  - Album art (center)
+  - Gradient background (based on album colors)
+  - Song title and playlist name below image
+  - Notification count (top-right)
+- **Control Tabs**:
+  1. **Playback**: Play/pause, previous, next buttons
+  2. **Volume**: Circular slider around album art
+  3. **Seek**: Circular slider showing progress, draggable to seek
+- **Remote Control**: Control Spotify on other devices (not local playback)
+
+#### Implementation Guidelines
+```cpp
+class SpotifyApp : public AppPage {
+public:
+    void init() override;
+    void render() override;
+    void update() override;
+    void handleTouch(TouchEvent event) override;
+private:
+    enum Tab { PLAYBACK, VOLUME, SEEK };
+    Tab currentTab;
+    SpotifyTrack currentTrack;
+    void renderPlaybackControls();
+    void renderVolumeSlider();
+    void renderSeekSlider();
+    void updateNowPlaying();
+};
+```
+
+### 5. AI Assistant App Page (`apps/ai_assistant/`) [V1 Feature]
+
+#### Requirements
+- **AI Models**: Google Gemini / Amazon Alexa / OpenAI / Claude
+- **Input**: Microphone (press center button to speak)
+- **Output**: 
+  - Audio response via speaker
+  - Text response rendered on display
+- **Circular Display**: Properly wrap text for circular screen
+- **Status**: Visual indicator when listening/processing
+
+#### Implementation Guidelines
+```cpp
+class AIAssistantApp : public AppPage {
+public:
+    void init() override;
+    void render() override;
+    void handleTouch(TouchEvent event) override;
+private:
+    void startListening();
+    void processVoiceCommand(AudioBuffer* audio);
+    void displayResponse(const char* text);
+    void speakResponse(const char* text);
+    bool isListening;
+};
+```
+
+### 6. Home Assistant App Page (`apps/home_assistant/`)
+
+#### Requirements
+- **API Integration**: Home Assistant API or Bluetooth
+- **Main Page**: Hexagonal grid of device types
+  - Light bulbs
+  - Timers
+  - Thermostats
+  - Speakers
+  - (Other smart home devices)
+- **Device List**: Tap device type → hexagonal grid of individual devices
+  - Background color per device (user-configurable)
+  - Device name/label
+- **Device Control**: Tap device → control page
+  - **Lights**: On/off toggle, circular slider for brightness/hue
+  - **Thermostat**: Temperature adjustment, mode selection
+  - **Speakers**: Volume control, playback controls
+  - **Settings**: Edit icon, background color (color picker), name
+
+#### Implementation Guidelines
+```cpp
+class HomeAssistantApp : public AppPage {
+public:
+    void init() override;
+    void render() override;
+    void handleTouch(TouchEvent event) override;
+private:
+    enum ViewMode { DEVICE_TYPES, DEVICE_LIST, DEVICE_CONTROL };
+    ViewMode currentView;
+    void renderDeviceTypes();
+    void renderDeviceList(DeviceType type);
+    void renderDeviceControl(Device* device);
+    std::vector<Device*> devices;
+};
+
+class LightControl : public DeviceControl {
+public:
+    void render() override;
+    void togglePower();
+    void setBrightness(float value);
+    void setHue(float value);
+};
+```
+
+### 7. Weather Page (`pages/lock_screen/weather/`)
+
+#### Requirements
+- **API Integration**: Google Weather / OpenWeatherMap
+- **Display**: 
+  - Large weather icon (center)
+  - Current temperature
+  - Conditions text
+  - Today's high/low
+- **Minimal Design**: Vibrant, clear, concise
+
+### 8. Clock Page (`pages/lock_screen/clock/`)
+
+#### Requirements
+- **Display**: Large, readable time
+- **Options**: Digital or analog
+- **RTC**: Use PCF85063 RTC chip
+- **Date**: Current date below time
+
+### 9. Calendar Page (`pages/lock_screen/calendar/`)
+
+#### Requirements
+- **API Integration**: Google Calendar API
+- **Display**:
+  - Today's events
+  - Upcoming events
+  - Event time and title
+- **Minimal Design**: Clear list view
+
+### 10. Settings Page (`pages/settings/`)
+
+#### Requirements
+- **Options**: Hexagonal grid or list view
+  - Display brightness
+  - Volume
+  - Wi-Fi settings
+  - Bluetooth settings
+  - User management
+  - App management
+  - About device
+
+### 11. Notification Page (`pages/notification/`)
+
+#### Requirements
+- **Display**: List of recent notifications
+- **Sources**: All apps (Slack, Spotify, Calendar, etc.)
+- **Actions**: Tap to open related app
+- **Clear**: Clear all notifications
+
+---
+
+## Coding Standards & Best Practices
+
+### 1. C++ Standards
+- **Version**: C++11 or later
+- **Naming Conventions**:
+  - **Directories/Folders**: `kebab-case` (e.g., `home-assistant/`, `ai-assistant/`)
+  - **Classes**: `PascalCase` (e.g., `DisplayDriver`, `TouchController`)
+  - **Files**: Match class name `PascalCase.h/cpp` (e.g., `DisplayDriver.h`, `DisplayDriver.cpp`)
+  - **Functions**: `camelCase` (e.g., `getTouchPoint`, `updateDisplay`)
+  - **Variables**: `camelCase` (e.g., `currentUser`, `touchPoint`)
+  - **Constants**: `UPPER_SNAKE_CASE` (e.g., `SCREEN_WIDTH`, `MAX_USERS`)
+  - **Private Members**: prefix with `m_` (e.g., `m_buffer`, `m_isInitialized`)
+  - **Enums**: `PascalCase` for type, `UPPER_CASE` for values
+    ```cpp
+    enum class TouchEvent {
+        NONE,
+        TAP,
+        DRAG,
+        SWIPE
+    };
+    ```
+
+### 2. Memory Management
+- **Stack vs Heap**: Prefer stack allocation when possible
+- **Dynamic Memory**: Use smart pointers (`std::unique_ptr`, `std::shared_ptr`)
+- **Buffers**: Pre-allocate buffers to avoid fragmentation
+- **Cleanup**: Always free resources in destructors
+
+### 3. Error Handling
+- **Return Codes**: Use boolean or enum return values
+- **Logging**: Implement logging system for debugging
+- **Serial Output**: Use Serial for development, disable in production
+
+### 4. Performance Optimization
+- **Frame Rate**: Target 30+ fps for smooth UI
+- **Buffering**: Always use double-buffering for display
+- **Caching**: Cache rendered UI elements when possible
+- **Partial Updates**: Only redraw dirty regions
+- **Async Operations**: Use FreeRTOS tasks for network/API calls
+
+### 5. Documentation
+- **Header Comments**: Every class/function must have purpose documented
+- **Inline Comments**: Explain complex logic
+- **README**: Each module should have README explaining usage
+
+### 6. Version Control
+- **Commits**: Atomic, descriptive commit messages
+- **Branches**: Feature branches for new development
+- **Tags**: Version tags for releases
+
+---
+
+## PlatformIO Configuration
+
+### Required Libraries
+```ini
+[env:esp32-s3-touch-lcd]
+platform = espressif32
+board = esp32-s3-devkitc-1
+framework = arduino
+
+board_build.mcu = esp32s3
+board_build.f_cpu = 240000000L
+board_build.flash_mode = qio
+board_build.psram_type = opi
+
+; Required libraries
+lib_deps = 
+    bodmer/TFT_eSPI@^2.5.43
+    lvgl/lvgl@^8.3.0
+    bblanchon/ArduinoJson@^6.21.0
+    sqlite3
+    https://github.com/espressif/esp32-camera.git
+    knolleary/PubSubClient@^2.8
+    
+; Build flags
+build_flags = 
+    -DCORE_DEBUG_LEVEL=0
+    -DBOARD_HAS_PSRAM
+    -mfix-esp32-psram-cache-issue
+    -DARDUINO_USB_CDC_ON_BOOT=1
+    
+; TFT_eSPI setup for ESP32-S3-Touch-LCD-1.85C
+    -DUSER_SETUP_LOADED=1
+    -DST7789_DRIVER=1
+    -DTFT_WIDTH=360
+    -DTFT_HEIGHT=360
+    -DTFT_MOSI=11
+    -DTFT_SCLK=12
+    -DTFT_CS=10
+    -DTFT_DC=8
+    -DTFT_RST=14
+    -DTFT_BL=9
+    -DLOAD_GLCD=1
+    -DLOAD_FONT2=1
+    -DLOAD_FONT4=1
+    -DLOAD_FONT6=1
+    -DLOAD_FONT7=1
+    -DLOAD_FONT8=1
+    -DLOAD_GFXFF=1
+    -DSMOOTH_FONT=1
+    -DSPI_FREQUENCY=80000000
+    -DSPI_READ_FREQUENCY=20000000
+
+monitor_speed = 115200
+upload_speed = 921600
+```
+
+---
+
+## Development Workflow
+
+### Phase 1: Core Infrastructure (V0 Requirements)
+1. ✅ Set up project structure
+2. ⬜ Implement DisplayManager with double-buffering
+3. ⬜ Implement TouchManager with event handling
+4. ⬜ Implement circular border and notification bar
+5. ⬜ Implement HexagonalGrid layout
+6. ⬜ Implement NavigationStack
+7. ⬜ Implement StorageManager and Database
+8. ⬜ Implement AuthManager with LoginGuard
+
+### Phase 2: UI Components & Pages
+1. ⬜ Create reusable UI components (buttons, sliders, badges)
+2. ⬜ Implement Main Menu page
+3. ⬜ Implement Lock Screen (clock, weather, calendar)
+4. ⬜ Implement Settings page
+5. ⬜ Implement Notification page
+
+### Phase 3: App Integrations
+1. ⬜ Slack app integration
+2. ⬜ Spotify app integration
+3. ⬜ Home Assistant app integration
+4. ⬜ Weather integration
+5. ⬜ Calendar integration
+
+### Phase 4: Audio & Advanced Features
+1. ⬜ Implement AudioManager
+2. ⬜ Implement PowerManager
+3. ⬜ Add notification sounds
+4. ⬜ Optimize performance
+5. ⬜ AI Assistant app [V1]
+
+### Testing & Optimization
+- Test each module independently
+- Integration testing
+- Performance profiling
+- Battery life optimization
+- Memory usage optimization
+
+---
+
+## Security Considerations
+
+### 1. API Token Storage
+- **Encryption**: Use AES-256 for encrypting tokens
+- **Key Management**: Store encryption keys securely
+- **Database**: SQLite with encryption extension
+
+### 2. Wi-Fi Credentials
+- **Storage**: Encrypted in database
+- **Transmission**: Use HTTPS for all API calls
+
+### 3. User Data
+- **Privacy**: Keep all data local on device
+- **Backup**: User-initiated backup to TF card
+- **Reset**: Factory reset option to wipe all data
+
+---
+
+## Extension Points
+
+### Adding New Apps
+1. Create new class inheriting from `AppPage`
+2. Implement required methods: `init()`, `render()`, `update()`, `handleTouch()`
+3. Add app configuration to database
+4. Add app icon to main menu
+5. Register app in app factory
+
+### Adding New UI Components
+1. Inherit from `UIComponent` base class
+2. Implement `render()` and `hitTest()` methods
+3. Add to component library
+
+### Adding New Pages
+1. Create page class inheriting from `Page`
+2. Add route to navigation system
+3. Implement page-specific logic
+
+---
+
+## API Documentation Reference
+
+### External APIs Used
+- **Slack API**: https://api.slack.com/
+- **Spotify Web API**: https://developer.spotify.com/documentation/web-api/
+- **Home Assistant API**: https://developers.home-assistant.io/docs/api/rest/
+- **Google Calendar API**: https://developers.google.com/calendar/api
+- **OpenWeatherMap API**: https://openweathermap.org/api
+- **Google Gemini API**: https://ai.google.dev/
+- **OpenAI API**: https://platform.openai.com/docs/api-reference
+
+---
+
+## Troubleshooting Guide
+
+### Common Issues
+1. **Display flickering**: Ensure double-buffering is properly implemented
+2. **Touch not responding**: Check I2C connections and touch controller initialization
+3. **SD card not mounting**: Format as FAT32, check connections
+4. **Low battery**: Implement proper power management
+5. **Memory issues**: Monitor heap usage, use PSRAM for large buffers
+
+### Debugging Tools
+- Serial monitor for logging
+- ESP32 exception decoder
+- Memory profiler
+- Performance profiler
+
+---
+
+## References & Resources
+
+### Hardware Documentation
+- ESP32-S3 Technical Reference: https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_en.pdf
+- Waveshare Wiki: https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-1.85C
+
+### Software Libraries
+- TFT_eSPI: https://github.com/Bodmer/TFT_eSPI
+- LVGL: https://lvgl.io/
+- ArduinoJson: https://arduinojson.org/
+- ESP-IDF: https://docs.espressif.com/projects/esp-idf/
+
+### Design Inspiration
+- Apple Watch UI/UX patterns
+- Material Design for circular displays
+- Wear OS design guidelines
+
+---
+
+## Custom Commands
+
+### `/implement` Command
+When using the `/implement` command, all code generation and feature implementation MUST adhere to:
+1. This project constitution document
+2. Established project structure and organization
+3. Coding standards and best practices defined herein
+4. Hardware specifications and constraints
+5. Security and performance requirements
+6. Reusable, modular, object-oriented design principles
+
+**Usage Example**: `/implement add volume control to Spotify page`
+
+The assistant will:
+- Reference this constitution
+- Follow established patterns
+- Maintain code quality
+- Ensure compatibility with existing modules
+- Update navigation/database as needed
+- Document changes appropriately
+
+---
+
+## Version History
+- **V0.1** (2024-10-04): Initial project constitution created
+  - Core infrastructure requirements defined
+  - Hardware specifications documented
+  - Project architecture established
+  - All V0 features specified
+
+---
+
+## Maintainers
+- **Project Lead**: Ben Madelin
+- **Target Device**: ESP32-S3-Touch-LCD-1.85C by Waveshare
+
+---
+
+**END OF PROJECT CONSTITUTION**
+
